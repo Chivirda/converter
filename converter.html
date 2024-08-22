@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Текстовый преобразователь</title>
+</head>
+<body>
+    <textarea id="input" rows="5" cols="50" placeholder="Введите текст..."></textarea><br>
+    <button onclick="processText()">Преобразовать</button>
+
+    <h3>Результат:</h3>
+    <p id="output"></p>
+    <p id="msd"></p>
+    <p id="coordinates"></p>
+    <p id="lan"></p>
+    <p id="lat"></p>
+
+    <script>
+        function processText() {
+            const inputText = document.getElementById('input').value;
+
+            // Шаг 1: Найдём квартал, выделы, делянку, площадь и объем
+            const kvMatch = inputText.match(/Кв\.\s*(\d+)/);
+            const vydMatch = inputText.match(/выд\.\s*([\d,\s]+)/);
+            const delMatch = inputText.match(/дел\.\s*(\d+)/);
+
+            const kv = kvMatch ? kvMatch[1] : '';
+            const vyd = vydMatch ? vydMatch[1].replace(/,\s*/g, ', ') : '';
+            const del = delMatch ? delMatch[1] : '';
+
+            // Шаг 2: Найдём номер лесной декларации и дату
+            const ldMatch = inputText.match(/Лесная декларация №\s*(\d+)\s*от\s*([\d.]+)/);
+            const ldNum = ldMatch ? ldMatch[1] : '';
+            const ldDate = ldMatch ? ldMatch[2] : '';
+
+            // Шаг 3: Найдём координаты
+            const coordMatch = inputText.match(/координаты:\s*([\d.,\s-]+)/);
+            const coordinates = coordMatch ? coordMatch[1].trim() : '';
+            const [lan, lat] = coordinates.split(',').map(coord => coord.trim());
+
+            // Шаг 4: Составляем итоговые строки
+            const outputText = `Архангельская область, Шенкурский район, Шенкурское лесничество, Ледское участковое лесничество, леса АО ${inputText.includes('АО Шеговары') ? 'Шеговары' : 'Ледское'}, квартал ${kv} выделы ${vyd} делянка ${del}`;
+            const msd = `МСД_кв_${kv}_дел_${del}`;
+
+            // Шаг 5: Выводим результат на страницу
+            document.getElementById('output').textContent = outputText;
+            document.getElementById('msd').textContent = msd;
+            document.getElementById('coordinates').textContent = `lan, lat: ${lan}, ${lat}`;
+            document.getElementById('lan').textContent = `lan: ${lan}`;
+            document.getElementById('lat').textContent = `lat: ${lat}`;
+        }
+    </script>
+</body>
+</html>
